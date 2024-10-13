@@ -2,27 +2,31 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_REGISTRY = "docker.io/writenowagency"
-        DOCKER_CREDENTIALS = credentials('docker-registry-credentials')
+        DOCKER_IMAGE_PREFIX = "writenowagency"
+        DOCKERHUB_CREDENTIALS = credentials('docker-hub-credentials')
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git credentialsId: 'github-credentials', url: 'https://github.com/Mokgadi-Julius/quickpost.git'
+                checkout scm
+            }
+        }
+
+        stage('Login to DockerHub') {
+            steps {
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
             }
         }
 
         stage('Build and Push Docker Images') {
             steps {
                 script {
-                    docker.withRegistry("https://registry.hub.docker.com", 'docker-registry-credentials') {
-                        def backendImage = docker.build("writenowagency/quickpost-backend:${env.BUILD_NUMBER}", "./backend")
-                        backendImage.push()
+                    def backendImage = docker.build("${DOCKER_IMAGE_PREFIX}/quickpost-backend:${env.BUILD_NUMBER}", "./backend")
+                    backendImage.push()
 
-                        def frontendImage = docker.build("writenowagency/quickpost-frontend:${env.BUILD_NUMBER}", "./frontend")
-                        frontendImage.push()
-                    }
+                    def frontendImage = docker.build("${DOCKER_IMAGE_PREFIX}/quickpost-frontend:${env.BUILD_NUMBER}", "./frontend")
+                    frontendImage.push()
                 }
             }
         }
@@ -30,6 +34,7 @@ pipeline {
 
     post {
         always {
+            sh 'docker logout'
             cleanWs()
         }
     }
