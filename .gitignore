@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.class
+venv/
+
+# React
+node_modules/
+/frontend/build
+
+# Environment variables
+.env
+
+# Logs
+*.log
+logs/
+
+# Docker
+.dockerignore
+
+# IDEs
+.vscode/
+.idea/
