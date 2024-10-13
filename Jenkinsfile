@@ -13,22 +13,22 @@ pipeline {
             }
         }
 
-        stage('Login to DockerHub') {
+        stage('Build and Push') {
             steps {
                 script {
-                    sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-                }
-            }
-        }
+                    // Login to DockerHub
+                    sh "echo \$DOCKERHUB_CREDENTIALS_PSW | docker login -u \$DOCKERHUB_CREDENTIALS_USR --password-stdin"
 
-        stage('Build and Push Docker Images') {
-            steps {
-                script {
+                    // Build and push backend image
                     def backendImage = docker.build("${DOCKER_IMAGE_PREFIX}/quickpost-backend:${env.BUILD_NUMBER}", "./backend")
                     backendImage.push()
 
+                    // Build and push frontend image
                     def frontendImage = docker.build("${DOCKER_IMAGE_PREFIX}/quickpost-frontend:${env.BUILD_NUMBER}", "./frontend")
                     frontendImage.push()
+
+                    // Logout from DockerHub
+                    sh "docker logout"
                 }
             }
         }
@@ -36,9 +36,6 @@ pipeline {
 
     post {
         always {
-            script {
-                sh 'docker logout'
-            }
             cleanWs()
         }
     }
