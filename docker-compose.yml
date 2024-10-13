@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   backend:
-    build: ./backend
+    image: writenowagency/prompt-generator-backend:${BUILD_NUMBER}
     ports:
       - "5000:5000"
     environment:
@@ -10,23 +10,13 @@ services:
       - ./backend/logs:/app/logs
       - ./backend/uploads:/app/uploads
       - ./backend/prompts:/app/prompts
-    networks:
-      - app-network
-    restart: unless-stopped
 
   frontend:
-    build: ./frontend
+    image: writenowagency/prompt-generator-frontend:${BUILD_NUMBER}
     ports:
       - "3000:80"
     depends_on:
       - backend
-    networks:
-      - app-network
-    restart: unless-stopped
-
-networks:
-  app-network:
-    driver: bridge
 
 volumes:
   backend_logs:
