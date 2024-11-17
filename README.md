@@ -1,4 +1,4 @@
-# Prompt Generator App
+# Social Media Content generator
 
 This application generates prompts based on images and trends.
 
