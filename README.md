@@ -1,6 +1,6 @@
 # Social Media Content generator
 
-This application generates prompts based on images and trends.
+This application generates content based on images and trends.
 
 ## Project Structure
 - backend/: Flask backend
